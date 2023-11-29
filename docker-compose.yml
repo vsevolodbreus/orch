@@ -1,0 +1,30 @@
+version: '3.7'
+
+services:
+
+  orch:
+    image: 'orch/orch:latest'
+    build:
+      context: .
+    depends_on:
+    - postgres
+    environment:
+      DATABASE_URL: postgresql://orch:orch@postgres:5432/orch
+    env_file:
+    - ./.env
+    ports:
+    - 8000:8000
+
+  postgres:
+    image: 'bitnami/postgresql:16'
+    environment:
+      POSTGRESQL_USERNAME: orch
+      POSTGRESQL_PASSWORD: orch
+      POSTGRESQL_DATABASE: orch
+      POSTGRESQL_POSTGRES_PASSWORD: postgres
+      POSTGRESQL_INITSCRIPTS_USERNAME: postgres
+      POSTGRESQL_INITSCRIPTS_PASSWORD: postgres
+    volumes:
+    - ./.postgres.setup.sql:/docker-entrypoint-initdb.d/00-uuid-ossp.sql
+    ports:
+    - 5432:5432
